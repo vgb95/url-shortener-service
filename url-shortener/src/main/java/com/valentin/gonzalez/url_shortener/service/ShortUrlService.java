@@ -2,6 +2,7 @@ package com.valentin.gonzalez.url_shortener.service;
 
 import com.valentin.gonzalez.url_shortener.entity.ShortUrl;
 import com.valentin.gonzalez.url_shortener.repository.ShortUrlRepository;
+import com.valentin.gonzalez.url_shortener.util.Base62Encoder;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -10,19 +11,22 @@ import java.util.UUID;
 public class ShortUrlService {
 
     private final ShortUrlRepository repository;
+    private final Base62Encoder base62Encoder;
 
-    public ShortUrlService(ShortUrlRepository repository) {
+    public ShortUrlService(ShortUrlRepository repository, Base62Encoder base62Encoder) {
         this.repository = repository;
+        this.base62Encoder = base62Encoder;
     }
 
     public String shortenUrl(String originalUrl){
-        String hash = UUID.randomUUID().toString().substring(0,8);
-
         ShortUrl url = new ShortUrl();
-        url.setHash(hash);
         url.setOriginalUrl(originalUrl);
+        url.setHash("temporal");
 
-        repository.save(url);
+        ShortUrl savedUrl = repository.save(url);
+        String hash = base62Encoder.encode(savedUrl.getId());
+        savedUrl.setHash(hash);
+        repository.save(savedUrl);
 
         return hash;
     }
