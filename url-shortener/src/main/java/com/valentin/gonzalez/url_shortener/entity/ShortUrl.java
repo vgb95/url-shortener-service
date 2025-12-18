@@ -24,6 +24,9 @@ public class ShortUrl {
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
+    @Column(nullable = false)
+    private Long clicks = 0L;
+
     public ShortUrl(){}
 
     @PrePersist

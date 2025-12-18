@@ -32,8 +32,18 @@ public class ShortUrlService {
     }
 
     public String getOriginalUrl(String hash){
-        return repository.findByHash(hash)
+       /* return repository.findByHash(hash)
                 .map(ShortUrl::getOriginalUrl)
-                .orElseThrow(() -> new RuntimeException("URL not found"));
+                .orElseThrow(() -> new RuntimeException("URL not found"));*/
+        long id = base62Encoder.decode(hash);
+        ShortUrl shortUrl = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("URL no encontrada"));
+
+        shortUrl.setClicks(shortUrl.getClicks() + 1);
+        repository.save(shortUrl);
+
+        return shortUrl.getOriginalUrl();
     }
+
+
 }
